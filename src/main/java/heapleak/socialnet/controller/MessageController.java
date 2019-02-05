@@ -14,9 +14,9 @@ import java.util.Map;
 public class MessageController {
     private int counter = 4;
     private List<Map<String, String>> messages = new ArrayList<Map<String, String>>(){{
-        add(new HashMap<String, String>(){{put("id", "1"); put("massage", "First");}});
-        add(new HashMap<String, String>(){{put("id", "2"); put("massage", "Second");}});
-        add(new HashMap<String, String>(){{put("id", "3"); put("massage", "Third");}});
+        add(new HashMap<String, String>(){{put("id", "1"); put("message", "First");}});
+        add(new HashMap<String, String>(){{put("id", "2"); put("message", "Second");}});
+        add(new HashMap<String, String>(){{put("id", "3"); put("message", "Third");}});
     }};
 
     @GetMapping
