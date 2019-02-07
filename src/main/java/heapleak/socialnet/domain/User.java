@@ -1,14 +1,16 @@
 package heapleak.socialnet.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usr")
-@Data // Auto generate getters and setters : lombok
-public class User {
+@Data
+public class User implements Serializable {
     @Id //id without autogeneration because id returned from google
     private String id;
     private String name;
@@ -16,5 +18,7 @@ public class User {
     private String email;
     private String gender;
     private String locale;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastVisit;
 }
