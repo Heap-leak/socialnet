@@ -3,6 +3,7 @@ package heapleak.socialnet.controller;
 import heapleak.socialnet.domain.User;
 import heapleak.socialnet.repo.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 @RequestMapping("/")
 public class IndexController {
     private final MessageRepo messageRepo;
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     @Autowired
     public IndexController(MessageRepo messageRepo) {
@@ -27,6 +30,7 @@ public class IndexController {
         data.put("profile", user);
         data.put("messages", messageRepo.findAll());
         model.addAttribute("frontData", data);
+        model.addAttribute("isDevMode", "dev".equals(profile));
         return "index";
     }
 }
