@@ -6,14 +6,7 @@
 </template>
 
 <script>
-    function getIndex(list, id){
-        for (var i = 0; i < list.length; i++){
-            if(list[i].id === id){
-                return i;
-            }
-        }
-        return -1;
-    }
+    import { sendMessage } from "../../../util/ws";
 
     export default {
         props : ['messages', 'messageAttr'],
@@ -31,27 +24,9 @@
         },
         methods: {
             save() {
-                const message = {message: this.message};
-                if(this.id){
-                    this.$resource('/message{/id}').update({ id: this.id} , message).then(
-                        result => result.json().then(
-                            data => {
-                                const index = getIndex(this.messages, data.id)
-                                this.messages.splice(index, 1, data)
-                                this.message = ''
-                                this.id = ''
-                            })
-                    );
-                }else {
-                    this.$resource('/message{/id}').save({}, message).then(result =>
-                        result.json().then(
-                            data => {
-                                this.messages.push(data)
-                                this.message = ''
-                            }
-                        )
-                    )
-                }
+                sendMessage({id: this.id, message: this.message})
+                this.message = ''
+                this.id = ''
             }
         }
     }
