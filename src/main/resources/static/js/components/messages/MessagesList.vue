@@ -32,7 +32,7 @@
             deleteMessage(message){
                 this.$resource('/message{/id}').remove({id: message.id}).then(result => {
                     if(result.ok){
-                        this.messages.splice(this.messages.indexOf(this.message), 1)
+                        this.messages.splice(this.messages.indexOf(message), 1)
                     }
                 })
             }
