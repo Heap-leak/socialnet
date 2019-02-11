@@ -4,25 +4,28 @@ package heapleak.socialnet.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import heapleak.socialnet.domain.Message;
 import heapleak.socialnet.domain.Views;
+import heapleak.socialnet.dto.EventType;
+import heapleak.socialnet.dto.ObjectType;
 import heapleak.socialnet.repo.MessageRepo;
+import heapleak.socialnet.util.WsSender;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+import java.util.function.BiConsumer;
 
 @RestController
 @RequestMapping("message")
 public class MessageController {
     private final MessageRepo messageRepo;
+    private final BiConsumer<EventType, Message> sender;
 
     @Autowired
-    public MessageController(MessageRepo messageRepo) {
+    public MessageController(MessageRepo messageRepo, WsSender sender) {
         this.messageRepo = messageRepo;
+        this.sender = sender.getSender(ObjectType.MESSAGE, Views.IdName.class);
     }
 
     @GetMapping
@@ -39,7 +42,9 @@ public class MessageController {
     @PostMapping
     public Message create(@RequestBody Message message){
         message.setCreationDate(LocalDateTime.now());
-        return messageRepo.save(message);
+        Message createdMessage = messageRepo.save(message);
+        sender.accept(EventType.CREATE, createdMessage);
+        return createdMessage;
     }
 
     @PutMapping("{id}")
@@ -47,18 +52,14 @@ public class MessageController {
             @PathVariable("id") Message messageFromDb,
             @RequestBody Message message){
         BeanUtils.copyProperties(message, messageFromDb, "id");
-        return messageRepo.save(messageFromDb);
+        Message updatedMessage = messageRepo.save(messageFromDb);
+        sender.accept(EventType.UPDATE, updatedMessage);
+        return updatedMessage;
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Message message){
         messageRepo.delete(message);
+        sender.accept(EventType.REMOVE, message);
     }
-
-    @MessageMapping("/changeMessage")
-    @SendTo("/topic/activity")
-    public Message change(Message message){
-        return messageRepo.save(message);
-    }
-
 }
