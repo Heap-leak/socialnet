@@ -27,8 +27,10 @@ public class IndexController {
     @GetMapping
     public String index(Model model, @AuthenticationPrincipal User user){
         HashMap<Object, Object> data = new HashMap<>();
-        data.put("profile", user);
-        data.put("messages", messageRepo.findAll());
+        if(user != null) {
+            data.put("profile", user);
+            data.put("messages", messageRepo.findAll());
+        }
         model.addAttribute("frontData", data);
         model.addAttribute("isDevMode", "dev".equals(profile));
         return "index";
